@@ -18,16 +18,42 @@ class Pedidos {
         return ResponseEntity.ok(mapOf("status" to "ok", "service" to "pedidos"))
     }
 
+    // Test Supabase connection
+    @GetMapping("/test")
+    fun testSupabase(): ResponseEntity<Map<String, Any>> = runBlocking {
+        return@runBlocking try {
+            val result = SupabaseClient.client
+                .from("pedidos")
+                .select()
+                .decodeList<PedidosSchema>()
+            ResponseEntity.ok(mapOf(
+                "status" to "success",
+                "count" to result.size,
+                "message" to "Conexión exitosa con Supabase"
+            ))
+        } catch (e: Exception) {
+            println("Error en test Supabase: ${e.message}")
+            e.printStackTrace()
+            ResponseEntity.ok(mapOf(
+                "status" to "error",
+                "error" to (e.message ?: "Error desconocido"),
+                "type" to e::class.simpleName!!
+            ))
+        }
+    }
+
     // GET / - Listar todos los pedidos
     @GetMapping
     fun getPedidos(): ResponseEntity<List<PedidosSchema>> = runBlocking {
         return@runBlocking try {
             val pedidos = SupabaseClient.client
-                .from("pedidos")
+                .from("orders")
                 .select()
                 .decodeList<PedidosSchema>()
             ResponseEntity.ok(pedidos)
         } catch (e: Exception) {
+            println("Error al obtener pedidos: ${e.message}")
+            e.printStackTrace()
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
         }
     }
@@ -37,7 +63,7 @@ class Pedidos {
     fun crearPedido(@RequestBody pedido: PedidoRequest): ResponseEntity<PedidosSchema> = runBlocking {
         return@runBlocking try {
             val nuevoPedido = SupabaseClient.client
-                .from("pedidos")
+                .from("orders")
                 .insert(pedido) {
                     select()
                 }
@@ -53,7 +79,7 @@ class Pedidos {
     fun getPedidoById(@PathVariable id: Int): ResponseEntity<PedidosSchema> = runBlocking {
         return@runBlocking try {
             val pedido = SupabaseClient.client
-                .from("pedidos")
+                .from("orders")
                 .select {
                     filter {
                         eq("id", id)
@@ -71,15 +97,15 @@ class Pedidos {
         }
     }
 
-    // GET /cliente/{clienteId} - Obtener pedidos de un cliente
-    @GetMapping("/cliente/{clienteId}")
-    fun getPedidosByCliente(@PathVariable clienteId: String): ResponseEntity<List<PedidosSchema>> = runBlocking {
+    // GET /user/{userId} - Obtener pedidos de un usuario
+    @GetMapping("/user/{userId}")
+    fun getPedidosByUser(@PathVariable userId: Int): ResponseEntity<List<PedidosSchema>> = runBlocking {
         return@runBlocking try {
             val pedidos = SupabaseClient.client
-                .from("pedidos")
+                .from("orders")
                 .select {
                     filter {
-                        eq("cliente_id", clienteId)
+                        eq("user_id", userId)
                     }
                 }
                 .decodeList<PedidosSchema>()
@@ -97,7 +123,7 @@ class Pedidos {
     ): ResponseEntity<PedidosSchema> = runBlocking {
         return@runBlocking try {
             val pedidoActualizado = SupabaseClient.client
-                .from("pedidos")
+                .from("orders")
                 .update(actualizacion) {
                     filter {
                         eq("id", id)
@@ -121,7 +147,7 @@ class Pedidos {
     fun eliminarPedido(@PathVariable id: Int): ResponseEntity<Unit> = runBlocking {
         return@runBlocking try {
             SupabaseClient.client
-                .from("pedidos")
+                .from("orders")
                 .delete {
                     filter {
                         eq("id", id)
@@ -138,19 +164,18 @@ class Pedidos {
 @Serializable
 data class PedidosSchema(
     val id: Int? = null,
-    val cliente_id: String? = null,
+    val user_id: Int? = null,
     val status: String? = null,
-    val direccion: String? = null,
     val total: Int? = null,
-    val created_at: String? = null
+    val created_at: String? = null,
+    val updated_at: String? = null
 )
 
 // DTO para crear pedido (sin id ni created_at)
 @Serializable
 data class PedidoRequest(
-    val cliente_id: String,
+    val user_id: Int,
     val status: String = "pendiente",
-    val direccion: String,
     val total: Int
 )
 
@@ -158,6 +183,5 @@ data class PedidoRequest(
 @Serializable
 data class PedidoUpdateRequest(
     val status: String? = null,
-    val direccion: String? = null,
     val total: Int? = null
 )
