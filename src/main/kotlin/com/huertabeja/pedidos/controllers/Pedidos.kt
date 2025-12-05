@@ -2,6 +2,7 @@ package com.huertabeja.pedidos
 
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -13,7 +14,7 @@ class Pedidos {
 
     // GET / - Listar todos los pedidos
     @GetMapping
-    suspend fun getPedidos(): ResponseEntity<List<PedidosSchema>> {
+    fun getPedidos(): ResponseEntity<List<PedidosSchema>> = runBlocking {
         return try {
             val pedidos = SupabaseClient.client
                 .from("pedidos")
@@ -27,7 +28,7 @@ class Pedidos {
 
     // POST / - Crear nuevo pedido
     @PostMapping
-    suspend fun crearPedido(@RequestBody pedido: PedidoRequest): ResponseEntity<PedidosSchema> {
+    fun crearPedido(@RequestBody pedido: PedidoRequest): ResponseEntity<PedidosSchema> = runBlocking {
         return try {
             val nuevoPedido = SupabaseClient.client
                 .from("pedidos")
@@ -43,7 +44,7 @@ class Pedidos {
 
     // GET /{id} - Obtener pedido por ID
     @GetMapping("/{id}")
-    suspend fun getPedidoById(@PathVariable id: Int): ResponseEntity<PedidosSchema> {
+    fun getPedidoById(@PathVariable id: Int): ResponseEntity<PedidosSchema> = runBlocking {
         return try {
             val pedido = SupabaseClient.client
                 .from("pedidos")
@@ -66,7 +67,7 @@ class Pedidos {
 
     // GET /cliente/{clienteId} - Obtener pedidos de un cliente
     @GetMapping("/cliente/{clienteId}")
-    suspend fun getPedidosByCliente(@PathVariable clienteId: String): ResponseEntity<List<PedidosSchema>> {
+    fun getPedidosByCliente(@PathVariable clienteId: String): ResponseEntity<List<PedidosSchema>> = runBlocking {
         return try {
             val pedidos = SupabaseClient.client
                 .from("pedidos")
@@ -84,10 +85,10 @@ class Pedidos {
 
     // PUT /{id} - Actualizar estado del pedido
     @PutMapping("/{id}")
-    suspend fun actualizarPedido(
+    fun actualizarPedido(
         @PathVariable id: Int,
         @RequestBody actualizacion: PedidoUpdateRequest
-    ): ResponseEntity<PedidosSchema> {
+    ): ResponseEntity<PedidosSchema> = runBlocking {
         return try {
             val pedidoActualizado = SupabaseClient.client
                 .from("pedidos")
@@ -111,7 +112,7 @@ class Pedidos {
 
     // DELETE /{id} - Eliminar pedido
     @DeleteMapping("/{id}")
-    suspend fun eliminarPedido(@PathVariable id: Int): ResponseEntity<Unit> {
+    fun eliminarPedido(@PathVariable id: Int): ResponseEntity<Unit> = runBlocking {
         return try {
             SupabaseClient.client
                 .from("pedidos")
