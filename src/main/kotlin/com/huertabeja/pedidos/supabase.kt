@@ -9,7 +9,7 @@ import io.ktor.client.plugins.*
 object SupabaseClient {
 
     private const val SUPABASE_URL = "https://pahjkcjiwxhohqfuurhw.supabase.co"
-    private const val SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBhaGprY2ppd3hob2hxZnV1cmh3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI5NjU4NjMsImV4cCI6MjA3ODU0MTg2M30.pFBYXFTYBSJHxAsPit0rUkZhnoD67KSSwYHFjBtN0iM"
+    private const val SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBhaGprY2ppd3hob2hxZnV1cmh3Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2Mjk2NTg2MywiZXhwIjoyMDc4NTQxODYzfQ.1PsBJNga0xE0v9EOfoECCCun47BL2-wo8HBtweF0In4"
 
     val client by lazy {
         createSupabaseClient(
