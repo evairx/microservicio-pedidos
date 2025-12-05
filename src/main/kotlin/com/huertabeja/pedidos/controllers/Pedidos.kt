@@ -12,10 +12,16 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/")
 class Pedidos {
 
+    // Health check endpoint
+    @GetMapping("/health")
+    fun health(): ResponseEntity<Map<String, String>> {
+        return ResponseEntity.ok(mapOf("status" to "ok", "service" to "pedidos"))
+    }
+
     // GET / - Listar todos los pedidos
     @GetMapping
     fun getPedidos(): ResponseEntity<List<PedidosSchema>> = runBlocking {
-        return try {
+        return@runBlocking try {
             val pedidos = SupabaseClient.client
                 .from("pedidos")
                 .select()
@@ -29,7 +35,7 @@ class Pedidos {
     // POST / - Crear nuevo pedido
     @PostMapping
     fun crearPedido(@RequestBody pedido: PedidoRequest): ResponseEntity<PedidosSchema> = runBlocking {
-        return try {
+        return@runBlocking try {
             val nuevoPedido = SupabaseClient.client
                 .from("pedidos")
                 .insert(pedido) {
@@ -45,7 +51,7 @@ class Pedidos {
     // GET /{id} - Obtener pedido por ID
     @GetMapping("/{id}")
     fun getPedidoById(@PathVariable id: Int): ResponseEntity<PedidosSchema> = runBlocking {
-        return try {
+        return@runBlocking try {
             val pedido = SupabaseClient.client
                 .from("pedidos")
                 .select {
@@ -68,7 +74,7 @@ class Pedidos {
     // GET /cliente/{clienteId} - Obtener pedidos de un cliente
     @GetMapping("/cliente/{clienteId}")
     fun getPedidosByCliente(@PathVariable clienteId: String): ResponseEntity<List<PedidosSchema>> = runBlocking {
-        return try {
+        return@runBlocking try {
             val pedidos = SupabaseClient.client
                 .from("pedidos")
                 .select {
@@ -89,7 +95,7 @@ class Pedidos {
         @PathVariable id: Int,
         @RequestBody actualizacion: PedidoUpdateRequest
     ): ResponseEntity<PedidosSchema> = runBlocking {
-        return try {
+        return@runBlocking try {
             val pedidoActualizado = SupabaseClient.client
                 .from("pedidos")
                 .update(actualizacion) {
@@ -113,7 +119,7 @@ class Pedidos {
     // DELETE /{id} - Eliminar pedido
     @DeleteMapping("/{id}")
     fun eliminarPedido(@PathVariable id: Int): ResponseEntity<Unit> = runBlocking {
-        return try {
+        return@runBlocking try {
             SupabaseClient.client
                 .from("pedidos")
                 .delete {
